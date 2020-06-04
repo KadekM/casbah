@@ -22,8 +22,7 @@
 package com.mongodb.casbah
 package gridfs
 
-import scala.beans.BeanInfo
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.language.reflectiveCalls
 
 import com.github.nscala_time.time.Imports._
@@ -56,13 +55,13 @@ abstract class GenericGridFS protected[gridfs] extends Logging {
   protected[gridfs] def loan[T <: GenericGridFSFile](file: T)(op: T => Option[AnyRef]) = op(file)
 
   /** Find by query */
-  def find[A <% DBObject](query: A): mutable.Buffer[MongoGridFSDBFile] = underlying.find(query).asScala
+  def find[A](query: A)(implicit ev$1: A => DBObject): mutable.Buffer[MongoGridFSDBFile] = underlying.find(query).asScala
 
   /** Find by query - returns a single item */
-  def find(id: ObjectId): MongoGridFSDBFile = underlying.find(id)
+  def findQ(id: ObjectId): MongoGridFSDBFile = underlying.find(id)
 
   /** Find by query  */
-  def find(filename: String): mutable.Buffer[MongoGridFSDBFile] = underlying.find(filename).asScala
+  def findQ(filename: String): mutable.Buffer[MongoGridFSDBFile] = underlying.find(filename).asScala
 
   def bucketName: String = underlying.getBucketName
 
@@ -74,19 +73,18 @@ abstract class GenericGridFS protected[gridfs] extends Logging {
     new MongoCursor(underlying.getFileList)
   }
 
-  def files[A <% DBObject](query: A): MongoCursor = {
+  def files[A](query: A)(implicit ev$1: A => DBObject): MongoCursor = {
     new MongoCursor(underlying.getFileList(query))
   }
 
-  def remove[A <% DBObject](query: A): Unit = underlying.remove(query)
+  def remove[A](query: A)(implicit ev$1: A => DBObject): Unit = underlying.remove(query)
 
-  def remove(id: ObjectId): Unit = underlying.remove(id)
+  def removeQ(id: ObjectId): Unit = underlying.remove(id)
 
-  def remove(filename: String): Unit = underlying.remove(filename)
+  def removeQ(filename: String): Unit = underlying.remove(filename)
 
 }
 
-@BeanInfo
 abstract class GenericGridFSFile(override val underlying: MongoGridFSFile) extends MongoDBObject with Logging {
   type DateType
 
@@ -128,7 +126,7 @@ abstract class GenericGridFSFile(override val underlying: MongoGridFSFile) exten
 
   def metaData: DBObject = underlying.getMetaData
 
-  def metaData_=[A <% DBObject](meta: A): Unit = underlying.setMetaData(meta)
+  def metaData_=[A](meta: A)(implicit ev$1: A => DBObject): Unit = underlying.setMetaData(meta)
 
   def md5: String = underlying.getMD5
 
@@ -152,7 +150,6 @@ class GridFSDBFileSafeJoda extends MongoGridFSDBFile {
   }
 }
 
-@BeanInfo
 abstract class GenericGridFSDBFile protected[gridfs] (override val underlying: MongoGridFSDBFile) extends GenericGridFSFile(underlying) {
 
   def inputStream: InputStream = underlying.getInputStream
@@ -178,7 +175,6 @@ abstract class GenericGridFSDBFile protected[gridfs] (override val underlying: M
   }
 }
 
-@BeanInfo
 abstract class GenericGridFSInputFile protected[gridfs] (override val underlying: MongoGridFSInputFile) extends GenericGridFSFile(underlying) {
   def filename_=(name: String): Unit = underlying.setFilename(name)
 

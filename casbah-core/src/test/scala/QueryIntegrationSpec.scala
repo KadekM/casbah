@@ -22,7 +22,7 @@
 
 package com.mongodb.casbah.test.core
 
-import scala.collection.JavaConverters._
+import scala.jdk.CollectionConverters._
 import scala.language.reflectiveCalls
 
 import com.mongodb.WriteConcernException
@@ -404,7 +404,7 @@ class QueryIntegrationSpec extends CasbahDBTestSpecification {
     "Accept a single value" in {
       collection.drop()
       collection += MongoDBObject("a" -> "b")
-      val addToSet = $addToSet("foo" -> "bar")
+      val addToSet = $addToSetQ("foo" -> "bar")
       collection.update(MongoDBObject("a" -> "b"), addToSet)
       val doc = collection.findOne().get
       doc.as[MongoDBList]("foo") must beEqualTo(MongoDBList("bar"))
@@ -412,7 +412,7 @@ class QueryIntegrationSpec extends CasbahDBTestSpecification {
     "Accept multiple values" in {
       collection.drop()
       collection += MongoDBObject("a" -> "b")
-      val addToSet = $addToSet("foo" -> "bar", "x" -> 5.2)
+      val addToSet = $addToSetQ("foo" -> "bar", "x" -> 5.2)
       collection.update(MongoDBObject("a" -> "b"), addToSet)
       val doc = collection.findOne().get
       doc.keySet.asScala must beEqualTo(Set("_id", "a", "foo", "x"))
@@ -422,7 +422,7 @@ class QueryIntegrationSpec extends CasbahDBTestSpecification {
     "Function with the $each operator for multi-value updates" in {
       collection.drop()
       collection += MongoDBObject("a" -> "b")
-      val addToSet = $addToSet("foo") $each ("x", "y", "foo", "bar", "baz")
+      val addToSet = $addToSetQ("foo") $each ("x", "y", "foo", "bar", "baz")
       collection.update(MongoDBObject("a" -> "b"), addToSet)
       val doc = collection.findOne().get
       doc.as[MongoDBList]("foo") must beEqualTo(MongoDBList("x", "y", "foo", "bar", "baz"))

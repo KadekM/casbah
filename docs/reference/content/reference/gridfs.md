@@ -64,10 +64,10 @@ val id = gridfs(logo) { f =>
 }
 
 // Find a file in GridFS by its ObjectId
-val myFile = gridfs.findOne(id.get.asInstanceOf[ObjectId])
+val myFile = gridfs.findOneQ(id.get.asInstanceOf[ObjectId])
 
 // Or find a file in GridFS by its filename
-val myFile = gridfs.findOne("mongodb_logo.png")
+val myFile = gridfs.findOneQ("mongodb_logo.png")
 
 // Print all filenames stored in GridFS
 for (f <- gridfs) println(f.filename)

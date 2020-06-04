@@ -23,7 +23,6 @@ package com.mongodb.casbah
 package gridfs
 
 import java.io.{ File, InputStream }
-import scala.beans.BeanInfo
 
 import com.mongodb.gridfs.{
   GridFS => MongoGridFS,
@@ -66,7 +65,7 @@ class GridFS protected[gridfs] (override val underlying: MongoGridFS) extends Ge
 
     def count(): Int = fileSet.count
 
-    override def length: Int = fileSet.length
+    //override def length: Int = fileSet.length
 
     def numSeen(): Int = fileSet.numSeen
 
@@ -210,7 +209,7 @@ class GridFS protected[gridfs] (override val underlying: MongoGridFS) extends Ge
         Option(fh.id)
     }
 
-  def findOne[A <% DBObject](query: A): Option[GridFSDBFile] = {
+  def findOne[A](query: A)(implicit ev$1: A => DBObject): Option[GridFSDBFile] = {
     filesCollection.findOne(query) match {
       case None => None
       case x => {
@@ -221,19 +220,16 @@ class GridFS protected[gridfs] (override val underlying: MongoGridFS) extends Ge
     }
   }
 
-  def findOne(id: ObjectId): Option[GridFSDBFile] = findOne(MongoDBObject("_id" -> id))
+  def findOneQ(id: ObjectId): Option[GridFSDBFile] = findOne(MongoDBObject("_id" -> id))
 
-  def findOne(filename: String): Option[GridFSDBFile] = findOne(MongoDBObject("filename" -> filename))
+  def findOneQ(filename: String): Option[GridFSDBFile] = findOne(MongoDBObject("filename" -> filename))
 
 }
 
-@BeanInfo
 class GridFSFile(_underlying: MongoGridFSFile) extends GenericGridFSFile(_underlying) with ConvertToDate
 
-@BeanInfo
 class GridFSDBFile(_underlying: MongoGridFSDBFile) extends GenericGridFSDBFile(_underlying) with ConvertToDate
 
-@BeanInfo
 class GridFSInputFile(_underlying: MongoGridFSInputFile) extends GenericGridFSInputFile(_underlying) with ConvertToDate
 
 trait ConvertToDate {

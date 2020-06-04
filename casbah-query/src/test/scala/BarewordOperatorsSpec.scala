@@ -245,16 +245,16 @@ class BarewordOperatorsSpec extends CasbahMutableSpecification {
 
     "$addToSet" in {
       "Accept a single value" in {
-        val addToSet = $addToSet("foo" -> "bar")
+        val addToSet = $addToSetQ("foo" -> "bar")
         addToSet must haveEntry("$addToSet.foo" -> "bar")
       }
       "Accept multiple values" in {
-        val addToSet = $addToSet("foo" -> "bar", "x" -> 5.2)
+        val addToSet = $addToSetQ("foo" -> "bar", "x" -> 5.2)
         addToSet must haveEntry("$addToSet.foo" -> "bar")
         addToSet must haveEntry("$addToSet.x" -> 5.2)
       }
       "Function with the $each operator for multi-value updates" in {
-        val addToSet = $addToSet("foo") $each ("x", "y", "foo", "bar", "baz")
+        val addToSet = $addToSetQ("foo") $each ("x", "y", "foo", "bar", "baz")
         addToSet must haveListEntry("$addToSet.foo.$each", Seq("x", "y", "foo", "bar", "baz"))
       }
     }

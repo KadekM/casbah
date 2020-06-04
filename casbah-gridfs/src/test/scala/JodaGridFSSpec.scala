@@ -42,11 +42,11 @@ class JodaGridFSSpec extends GridFSSpecification with BeforeEach {
   val gridfs = JodaGridFS(database, "jodaGridFs")
 
   def findItem(id: ObjectId, filename: Option[String] = None, contentType: Option[String] = None) = {
-    gridfs.findOne(id) must beSome[JodaGridFSDBFile]
+    gridfs.findOneQ(id) must beSome[JodaGridFSDBFile]
     var md5 = ""
     var fn: Option[String] = None
     var ct: Option[String] = None
-    gridfs.findOne(id) foreach {
+    gridfs.findOneQ(id) foreach {
       file =>
         md5 = file.md5
         fn = file.filename
@@ -67,10 +67,10 @@ class JodaGridFSSpec extends GridFSSpecification with BeforeEach {
           fh.filename = "powered_by_mongo_find.png"
           fh.contentType = "image/png"
       }
-      gridfs.findOne("powered_by_mongo_find.png") must beSome[JodaGridFSDBFile]
+      gridfs.findOneQ("powered_by_mongo_find.png") must beSome[JodaGridFSDBFile]
       var md5 = ""
       var uploadDate: DateTime = null
-      gridfs.findOne("powered_by_mongo_find.png") foreach {
+      gridfs.findOneQ("powered_by_mongo_find.png") foreach {
         file =>
           md5 = file.md5
           uploadDate = file.uploadDate
@@ -79,7 +79,7 @@ class JodaGridFSSpec extends GridFSSpecification with BeforeEach {
       require(uploadDate != null)
       uploadDate must beAnInstanceOf[DateTime]
 
-      gridfs.findOne(id.get.asInstanceOf[ObjectId]) foreach {
+      gridfs.findOneQ(id.get.asInstanceOf[ObjectId]) foreach {
         file =>
           md5 = file.md5
           uploadDate = file.uploadDate
@@ -97,14 +97,14 @@ class JodaGridFSSpec extends GridFSSpecification with BeforeEach {
           fh.filename = "powered_by_mongo_find.png"
           fh.contentType = "image/png"
       }
-      gridfs.find("powered_by_mongo_find.png") foreach {
+      gridfs.findQ("powered_by_mongo_find.png") foreach {
         file => file must beAnInstanceOf[MongoGridFSDBFile]
       }
       success
     }
 
     "Correctly catch the non-existence of a file and fail gracefully" in {
-      gridfs.findOne("powered_by_mongoFOOBAR235254252.png") must beNone
+      gridfs.findOneQ("powered_by_mongoFOOBAR235254252.png") must beNone
     }
 
     "Return a wrapped MongoCursor if you call files,  as reported by Gregg Carrier" in {
@@ -131,11 +131,11 @@ class JodaGridFSSpec extends GridFSSpecification with BeforeEach {
           fh.contentType = "text/plain"
       }
 
-      val file = gridfs.findOne("hello_world.txt")
+      val file = gridfs.findOneQ("hello_world.txt")
       file.get.source.mkString must beEqualTo("hello world")
 
       // Ensure the iterator also works
-      gridfs.iterator.filter(f => f.filename == "hello_world.txt").foreach(f =>
+      gridfs.iterator.filter(f => f.filename.contains("hello_world.txt")).foreach(f =>
         f.source.mkString must beEqualTo("hello world"))
       success
     }
@@ -151,10 +151,10 @@ class JodaGridFSSpec extends GridFSSpecification with BeforeEach {
           fh.contentType = "image/png"
       }
 
-      gridfs.findOne("powered_by_mongo_find_datetime.png") must beSome[JodaGridFSDBFile]
+      gridfs.findOneQ("powered_by_mongo_find_datetime.png") must beSome[JodaGridFSDBFile]
       var md5 = ""
       var uploadDate: DateTime = null
-      gridfs.findOne("powered_by_mongo_find_datetime.png") foreach {
+      gridfs.findOneQ("powered_by_mongo_find_datetime.png") foreach {
         file =>
           md5 = file.md5
           uploadDate = file.uploadDate
@@ -163,7 +163,7 @@ class JodaGridFSSpec extends GridFSSpecification with BeforeEach {
       require(uploadDate != null)
       uploadDate must beAnInstanceOf[DateTime]
 
-      gridfs.findOne(id.get.asInstanceOf[ObjectId]) foreach {
+      gridfs.findOneQ(id.get.asInstanceOf[ObjectId]) foreach {
         file =>
           md5 = file.md5
           uploadDate = file.uploadDate
@@ -183,7 +183,7 @@ class JodaGridFSSpec extends GridFSSpecification with BeforeEach {
 
       var md5 = ""
       var uploadDate: DateTime = null
-      gridfs.findOne("powered_by_mongo_find_local.png") foreach {
+      gridfs.findOneQ("powered_by_mongo_find_local.png") foreach {
         file =>
           md5 = file.md5
           uploadDate = file.uploadDate
@@ -201,7 +201,7 @@ class JodaGridFSSpec extends GridFSSpecification with BeforeEach {
 
       var md5 = ""
       var uploadDate: DateTime = null
-      gridfs.findOne("powered_by_mongo_find_date.png") foreach {
+      gridfs.findOneQ("powered_by_mongo_find_date.png") foreach {
         file =>
           md5 = file.md5
           uploadDate = file.uploadDate
